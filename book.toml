@@ -1,0 +1,6 @@
+[book]
+authors = ["David Emett"]
+language = "en"
+multilingual = false
+src = "src"
+title = "Substrate Mix Network Specification"
