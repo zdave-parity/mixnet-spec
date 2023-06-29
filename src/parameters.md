@@ -3,7 +3,7 @@
 All nodes in a Substrate Mix Network should agree on the following parameters:
 
 - Mean forwarding delay. This is the average artificial packet delay at [each
-  hop](./sphinx.md#forward-actions) along a route.
+  hop](./sphinx.md#forward-actions).
 - Mean extrinsic delay. This is the average artificial delay between receipt of a
   [`SubmitExtrinsic`](./requests-and-replies.md#submitextrinsic) request and import of the attached
   extrinsic.
