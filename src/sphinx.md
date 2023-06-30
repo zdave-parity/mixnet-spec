@@ -12,7 +12,9 @@ All packets are the same size: 2,252 bytes. These bytes are split as follows:
 | 0..31     | `kx_public` | X25519 public key, &alpha; in the Sphinx paper        |
 | 32..47    | `mac`       | MAC, &gamma; in the Sphinx paper                      |
 | 48..187   | `actions`   | Encrypted routing actions, &beta; in the Sphinx paper |
+// TODO make it clear it is routing actions for 7 peers.
 | 188..2251 | `payload`   | Encrypted payload, &delta; in the Sphinx paper        |
+// TODO maybe show somehow that payload can contains a SURB.
 
 The `kx_public`, `mac`, and `actions` fields together form the header.
 
@@ -57,6 +59,7 @@ These are derived as follows:
 ## MAC verification
 
 `mac` should equal the BLAKE2b hash of `actions` computed with the key `mac_key`.
+// TODO is it the first 16 byte?
 
 The receiving node determines the packet's session by which X25519 secret key results in the hash
 equalling `mac`. If neither the previous nor current session key results in a hash equalling `mac`,
@@ -73,6 +76,7 @@ additional data:
 
 | Action   | Description                                | Additional data              |
 |----------|--------------------------------------------|------------------------------|
+// TODO a bit unclear why we would have a Mac when there is on define outside in packet structure.
 | < 0xff00 | Forward to the mixnode with this index     | 16-byte MAC                  |
 | 0xff00   | Forward to the node with the given peer ID | 32-byte peer ID, 16-byte MAC |
 | 0xff01   | Deliver request packet                     | None                         |
@@ -87,6 +91,8 @@ Actions are tightly packed, with the first two bytes of `actions` giving the fir
 nonce of zero. Actions past the first are encrypted further with different keys; only the first
 action can be fully decrypted by the receiving node.
 
+// TODO maybe at this point have size of a single routing action (max and min ).
+
 ### Forward actions
 
 If the first action is a forward action, and the receiving node is a mixnode in the session, it
@@ -96,6 +102,7 @@ transformed.
 
 The artificial delay should be calculated as `exp_random(delay_seed) * mean_delay`, where
 `mean_delay` is the mean forwarding delay (see the [parameters chapter](./parameters.md)).
+// TODO state if something prevent not following this rule.
 
 The packet should be transformed as follows:
 
@@ -242,6 +249,9 @@ route](./topology.md#route-generation):
 - One forward-to-peer-ID action (50 bytes).
 - One deliver action with a 16-byte ID (18 bytes).
 
+// TODO this note on the different actions size and worst_case_route and how they can compose is very important, could
+// be in its own chapter (not much info in the linked chapter).
+
 ### Payload
 
 Constructing `payload` is straightforward. For cover packets, simply fill `payload` with random
@@ -255,6 +265,9 @@ bytes. For request packets:
   for the destination node).
 
 ## SURBs
+
+// TODO make it clear where are surb IIRC start of payload and we know if it is here from the action
+// type.
 
 A SURB (single-use reply block) can be used to send a reply packet to the node that generated it.
 As the name suggests, each SURB should only be used once. SURBs are always 222 bytes, split as
@@ -298,3 +311,7 @@ Constructing a reply packet from a SURB is straightforward:
 
 The constructed packet should be sent to the mixnode with index `first_mixnode_index`. The session
 is implicit: it should match the session used by the request message containing the SURB.
+
+
+// TODO generally I don't know if all algo construction are strictly necessary, can certainly help,
+// I did not really check them though.

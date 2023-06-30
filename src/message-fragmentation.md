@@ -6,16 +6,22 @@ destination node is responsible for collecting the fragments together and reasse
 
 ## Fragment structure
 
+// TODO it is not exactly clear where this fragment is when looking at `sphinx`. IIUC sphinx payload contains
+// the fragment. (means that some of the point I raised in `sphinx.md` can just refer to this md.
 The 2,048 bytes in a fragment are split as follows:
 
 | Bytes    | Field                   | Description                                                    |
 |----------|-------------------------|----------------------------------------------------------------|
 | 0..15    | `message_id`            | The same for all fragments of a message                        |
 | 16..17   | `num_fragments_minus_1` | Little-endian number of fragments minus one                    |
+// TODO theorical max size of a full message (2^16 + 1) * fragement payload size.
+// TODO with two byte of size, is it really worth it to minus 1, I mean it prevents size 0, but size 0 is not
+// that problematic, it would just mean empty message.
 | 18..19   | `fragment_index`        | Little endian index of this fragment                           |
 | 20..21   | `data_size`             | Little-endian number of bytes of message data in this fragment |
 | 22       | `num_surbs`             | Number of SURBs in this fragment                               |
 | 23..2047 | `payload`               | Message data and SURBs                                         |
+// TODO explicitely state if surbs are before or after message.
 
 `payload` has `data_size` bytes of message data at the start, and `num_surbs`
 [SURBs](./sphinx.md#surbs) tightly packed at the end. Any unused bytes in the middle should be
@@ -43,8 +49,12 @@ Note that:
 - Nodes should enforce a limit on the number of fragments per message (see the [parameters
   chapter](./parameters.md)), by simply discarding fragments with a too-large
   `num_fragments_minus_1`.
+// TODO should common parameter like this be part of the runtime api?
 - Multiple fragments with the same `message_id` and `fragment_index` may be received. It is
   recommended that only one be kept.
+// TODO maybe also acceptable to drop all if they differs in content.
+// Explicitelly this means that a packet can be send twice? Or we store only per message_id (in this
+// case the id may be too small to prevent collision?).
 - Invalid fragments, with `fragment_index > num_fragments_minus_1` or `(data_size + (num_surbs *
   222)) > 2025`, should be discarded.
 
@@ -56,6 +66,8 @@ It is expected that nodes will only keep a limited number of fragments, for the 
 Message IDs should be randomly generated. When retransmitting a message, the message ID should be
 reused. If a new destination is chosen for retransmission however, or if the retransmission is in a
 different session, a new message ID should be generated.
+
+// TODO 128 bit of random is same as a uuid v4 so should prevent collision.
 
 There are essentially no rules on how message data and SURBs may be split amongst fragments; the
 only constraints are:

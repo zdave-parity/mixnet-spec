@@ -1,6 +1,6 @@
 # Conventions and definitions
 
-Code snippets roughly follow Rust syntax. `a . b` means the concatenation of arrays `a` and `b`.
+Code snippets roughly follow Rust syntax. `a ++ b` means the concatenation of arrays `a` and `b`.
 
 ## X25519
 
@@ -14,9 +14,9 @@ The `Curve25519` function, which multiplies a curve (or twist) point by a "scala
 secret key), is defined in the paper. The `clamp_scalar` function is defined as follows:
 
     fn clamp_scalar(scalar: [u8; 32]) -> [u8; 32] {
-        scalar[0] &= 248
-        scalar[31] &= 127
-        scalar[31] |= 64
+        scalar[0] &= 248 // TODO paper show {0, 8, 16, 24, . . . , 248}, I understand 7 different values, something like 1 << (salar[0] % 7) 
+        scalar[31] &= 127 // same as % 127
+        scalar[31] |= 64 // TODO: {64, 65, 66, . . . , 127} so we got {0...127}, here we do | 64 making simply +64 so we actually want initial range to b {0..63, since 63 is 0b11111 we should scalar[31] &= 63 instead of &= 127
         scalar
     }
 
@@ -35,7 +35,7 @@ with the given personalisation (ASCII encoded), seed (little-endian encoded), an
 The `exp_random` function is defined as follows:
 
     fn exp_random(seed: [u8; 16]) -> f64 {
-        rng = rand_chacha::ChaChaRng::from_seed(seed . seed)
+        rng = rand_chacha::ChaChaRng::from_seed(seed ++ seed)
         rng.sample::<f64, _>(rand_distr::Exp1).min(10.0)
     }
 
@@ -81,3 +81,6 @@ The following assertions should all succeed:
         ]),
         10.0
     )
+
+It targets a normal distribution using [ziggurat](https://www.doornik.com/research/ziggurat.pdf) method.
+Note that implementation can diverge here. (TODO meaning using a different random function would be hard to detect and we don't attempt to).

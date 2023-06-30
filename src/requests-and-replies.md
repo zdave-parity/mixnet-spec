@@ -50,6 +50,9 @@ Reply packets should simply be dropped if they cannot be pushed onto the request
 recommended however that nodes use additional queues and/or back-pressure to avoid dropping request
 packets.
 
+// TODO at this point the rate limiting is not really explicit, we know there is something from the phases description,
+but not sure how it is enforced, maybe could relate here.
+
 ## Request sending
 
 The session for a request should be chosen according to the table in the [sessions
@@ -70,6 +73,9 @@ described in the [topology chapter](./topology.md#route-generation).
 Multiple copies of each fragment may be sent to improve the chance of success. Each copy of a
 fragment should contain different SURBs, and should be sent along a different route to the
 destination.
+
+// TODO is it possible to send without surb: just polling on chain if the transaction get eventually
+// included. I mean some users may not want to have this surb reply.
 
 ### Retransmission
 
@@ -117,6 +123,9 @@ If a complete reply message is not received within this time, the request messag
 retransmitted. When retransmitting, different packet routes should be used, and new SURBs should be
 generated.
 
+// TODO maybe add: it is of for a mixnet node to disconnect a non mixnet node that don t respect these
+numbers. (even if it seems logic)
+
 ## Request handling
 
 Sending a reply message is similar to sending a request message. The message is [split into
@@ -133,6 +142,8 @@ request message).
 If two request messages with the same ID are received in short succession (as determined by the
 reply cooldown [parameter](./parameters.md)), the second message should be assumed to be a copy
 sent at the same time as the first, rather than a retransmission, and should be ignored.
+
+// TODO even if both contains different data?
 
 ## Reply handling
 

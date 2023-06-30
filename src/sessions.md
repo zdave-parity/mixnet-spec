@@ -50,3 +50,7 @@ The default session column indicates which session should be preferred for new r
 
 Note that once the last phase has been reached, the X25519 key pairs for the previous session are
 no longer needed, and nodes should discard them.
+
+// TODO here would be good to have the explanation that phase 0 is at the very start of a session
+// and state that session duration are defined by the runtime blockchain api (redundant with runtime-interface.md but helps the reading).
+// Could also indicate that implementor are not forced to follow these (I don't remember if we check rate anymore, I guess we don't).

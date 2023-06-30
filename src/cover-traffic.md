@@ -13,3 +13,5 @@ Nodes should dispatch drop and loop cover packets in each active session accordi
 processes. The average drop/loop rates should be the same for all mixnodes in a session, and for
 all non-mixnodes in a session; see the [parameters chapter](./parameters.md). Note that the rates
 should be halved in some phases; see the [sessions chapter](./sessions.md#phases).
+
+TODO maybe be explicit if `Node` is `mixnet-node` or if it includes `non-mixnet-nodes`.

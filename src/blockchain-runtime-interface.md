@@ -59,6 +59,11 @@ These functions can return the following errors:
 - `InsufficientRegistrations`; too few mixnodes were registered for the session (`num`, less than
   the minimum `min`). The mixnet is not operational in such sessions, although nodes should still
   handle traffic for the previous session in the first 3 phases.
+
+  // TODO this implies that we need to manually register nodes: should be good to define how it is
+  // done (offchain worker putting a extrinsic): this needs to be known by implementors (even if offchain
+  should be called by those correctly there may be some quirks).
+
 - `Discarded`; the mixnodes for the session were discarded by the runtime. This should only be
   returned by `MixnetApi_prev_mixnodes` during the last phase of a session. The mixnodes for the
   previous session should not be needed during this phase.
@@ -69,3 +74,5 @@ These functions can return the following errors:
 
 This should return the X25519 public key for the local node in the given session, or `None` if the
 key pair was discarded already.
+// TODO state that it targets a offchain worker and is not part of the chain consensus.
+// actually wonder if offchain should be part of the name.
